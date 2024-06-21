@@ -12,13 +12,16 @@
 #include <string>
 #include <unordered_map>
 
+#include "json_parser.h"
+
 namespace b_fs = boost::filesystem;
 
-class FileManager {
+class FileManager : public JsonParser {
  private:
   std::unordered_map<std::string, std::string> cash_json_;
   const std::string file_adress_;
 
+ public:
  private:
   std::string ReadFileContent(const std::string& file_path) {
     std::ifstream file(file_path);
@@ -32,30 +35,33 @@ class FileManager {
     file.close();
     return content;
   }
-  void OpenPah() {}
-  void OpenFile() {}
+  void OpenDirectopy(b_fs::path L_path) {
+    for (const auto& entry : b_fs::directory_iterator(L_path)) {
+      std::string file_content = ReadFileContent(entry.path().string());
+      cash_json_.insert(
+          {entry.path().string(), file_content});  // Заполнение unordered_map
+      std::cout << "File: " << entry.path().string() << "\nContent:\n"
+                << file_content << "\n"
+                << std::endl;
+    }
+  }
+  void OpenFile() {
+    std::string file_content = ReadFileContent(file_adress_);
+    cash_json_[file_adress_] = file_content;
+    std::cout << "File: " << file_adress_ << "\nContent:\n"
+              << file_content << "\n"
+              << std::endl;
+  }
 
   /**
    * @brief Открытие пути файла или папки
    */
-  void OpenPah() {
-    b_fs::path p(file_adress_);
-    if (b_fs::exists(p)) {  // проверка на валидность пути
-      if (b_fs::is_directory(p)) {  // проверка является ли путь директорией
-        for (const auto& entry : b_fs::directory_iterator(p)) {
-          std::string file_content = ReadFileContent(entry.path().string());
-          cash_json_.insert({entry.path().string(),
-                             file_content});  // Заполнение unordered_map
-          std::cout << "File: " << entry.path().string() << "\nContent:\n"
-                    << file_content << "\n"
-                    << std::endl;
-        }
+  void OpenPath() {
+    b_fs::path path(file_adress_);
+    if (b_fs::exists(path)) {  // проверка на валидность пути
+      if (b_fs::is_directory(path)) {  // проверка является ли путь директорией
+        OpenDirectopy(path);
       } else {
-        std::string file_content = ReadFileContent(file_adress_);
-        cash_json_[file_adress_] = file_content;
-        std::cout << "File: " << file_adress_ << "\nContent:\n"
-                  << file_content << "\n"
-                  << std::endl;
       }
       std::cout << "Cash_json_ size: " << cash_json_.size() << std::endl;
     } else {
@@ -69,7 +75,9 @@ class FileManager {
   FileManager& operator=(const FileManager&) = delete;
   FileManager(FileManager&&) = delete;
   // удаление сандартного коструктора,копирования,перемещения,присваивания
-  FileManager(std::string file_adress) : file_adress_(file_adress) {}
+  FileManager(std::string file_adress) : file_adress_(file_adress) {
+    OpenPath();
+  }
   ~FileManager() {}
 };
 
