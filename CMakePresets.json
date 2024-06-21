@@ -2,9 +2,8 @@
     "version": 8,
     "configurePresets": [
         {
-            "name": "Custom configure preset",
-            "displayName": "Custom configure preset",
-            "description": "Sets Ninja generator, build and install directory",
+            "name": "vspkg conf preset",
+            "displayName": "vspkg conf preset",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {

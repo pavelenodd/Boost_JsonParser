@@ -11,14 +11,16 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "json_parser.h"
 
 namespace b_fs = boost::filesystem;
 
-class FileManager : public JsonParser {
+class FileManager : private parser::JsonParser {
  private:
   std::unordered_map<std::string, std::string> cash_json_;
+  std::vector<std::string> key_array_;
   const std::string file_adress_;
 
  public:
@@ -26,7 +28,7 @@ class FileManager : public JsonParser {
   std::string ReadFileContent(const std::string& file_path) {
     std::ifstream file(file_path);
     if (!file.is_open()) {
-      std::cerr << "Unable to open file: " << file_path << std::endl;
+      std::cout << "Unable to open file: " << file_path << std::endl;
       return "";
     }
 
@@ -46,11 +48,26 @@ class FileManager : public JsonParser {
     }
   }
   void OpenFile() {
-    std::string file_content = ReadFileContent(file_adress_);
-    cash_json_[file_adress_] = file_content;
-    std::cout << "File: " << file_adress_ << "\nContent:\n"
-              << file_content << "\n"
-              << std::endl;
+    // Получение расширения файла
+
+    b_fs::path file_path(file_adress_);
+    std::string extension = file_path.extension().string();
+    if (extension == ".txt") {
+      std::cout << "File extension is .txt" << std::endl;
+    } else if (extension == ".json") {
+      try {
+        cash_json_ = ParseJson(file_adress_, key_array_);
+
+        // TODO: удалить сделано для визуализации работы
+        for (const auto& [key, value] : cash_json_) {
+          std::cout << key << ": " << value << std::endl;
+        }
+        //
+
+      } catch (const std::exception& e) {
+        std::cout << e.what() << '\n';
+      }
+    }
   }
 
   /**
@@ -62,10 +79,11 @@ class FileManager : public JsonParser {
       if (b_fs::is_directory(path)) {  // проверка является ли путь директорией
         OpenDirectopy(path);
       } else {
+        OpenFile();
       }
       std::cout << "Cash_json_ size: " << cash_json_.size() << std::endl;
     } else {
-      std::cerr << "Path does not exist or is not a directory!" << std::endl;
+      std::cout << "Path does not exist or is not a directory!" << std::endl;
     }
   }
 
@@ -74,8 +92,24 @@ class FileManager : public JsonParser {
   FileManager(const FileManager&) = delete;
   FileManager& operator=(const FileManager&) = delete;
   FileManager(FileManager&&) = delete;
-  // удаление сандартного коструктора,копирования,перемещения,присваивания
-  FileManager(std::string file_adress) : file_adress_(file_adress) {
+  // ^удаление сандартного коструктора,копирования,перемещения,присваивания
+
+  /**
+   * @brief Конструктор для парсинга JSON-файла
+   * @param file_adress - путь к файлу
+   * @param key_array - массив ключей
+   */
+  FileManager(std::string&& file_adress,  //
+              std::vector<std::string>&& key_array)
+      : file_adress_(file_adress), key_array_(key_array) {
+    OpenPath();
+  }
+
+  /**
+   * @brief Конструктор для парсинга TXT-файла
+   * @param file_adress - путь к файлу
+   */
+  FileManager(std::string&& file_adress) : file_adress_(file_adress) {
     OpenPath();
   }
   ~FileManager() {}
@@ -89,11 +123,9 @@ int main(int argc, char* argv[]) {
 #ifdef __linux__
   setlocale(LC_ALL, "ru_RU.UTF-8");
 #endif
-  try {
-    FileManager fm("E:/Projects/Pets/Boost_JsonParser/src/test");
-  } catch (const std::exception& e) {
-    std::cerr << e.what() << '\n';
-  }
+
+  FileManager fm("E:/Projects/Pets/Boost_JsonParser/src/test/test.json",
+                 {"name", "age"});
 
   return 0;
 }
