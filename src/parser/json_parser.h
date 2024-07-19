@@ -1,3 +1,5 @@
+#pragma once
+
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
@@ -7,11 +9,18 @@
 
 namespace parser {
 namespace b_pt = boost::property_tree;
+using unordered_map_str_str = std::unordered_map<std::string, std::string>;
 
 class JsonParser {
  private:
-  b_pt::ptree tree_;
+  b_pt::ptree tree_;  // JSON-дерево
 
+  /**
+   * Считывает содержимое файла JSON и сохраняет его в дереве свойств.
+   * @param L_file_name Путь к файлу JSON для чтения.
+   * @throws b_pt::json_parser::json_parser_error Если файл JSON не может быть
+   * проанализирован
+   */
   void ReadJson(const std::string& L_file_name) {
     try {
       b_pt::read_json(L_file_name, tree_);
@@ -27,11 +36,11 @@ class JsonParser {
    * @param key_array - массив ключей для парсинга
    * @result unordered_map<std::string, std::string>
    */
-  std::unordered_map<std::string, std::string> ParseJson(
-      const std::string& file_name, const std::vector<std::string>& key_array) {
+  unordered_map_str_str ParseJson(const std::string& file_name,  //
+                                  const std::vector<std::string>& key_array) {
     ReadJson(file_name);
 
-    std::unordered_map<std::string, std::string> result;
+    unordered_map_str_str result;
     for (const auto& key : key_array) {
       std::string param = tree_.get<std::string>(key);
       result[key] = param;
