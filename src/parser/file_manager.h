@@ -77,5 +77,14 @@ class FileManager : private parser::JsonParser {
   FileManager(std::string&& L_file_adress);
   ~FileManager();
 
+  /**
+   *Получает результат функции.
+   *
+   *@tparam T тип ключа в неупорядоченной карте
+   *@tparam U тип значения в неупорядоченной карте
+   *
+   *@return неупорядоченная карта, содержащая результат
+   */
+
   unordered_map_str_str Get_Result() const;
 };

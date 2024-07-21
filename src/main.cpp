@@ -17,7 +17,9 @@ int main(int argc, char* argv[]) {
 #endif
 
   FileManager fm("test/test.json", {"age"});
-  std::cout << fm.Get_Result()[0] << std::endl;
+  for (auto a : fm.Get_Result()) {
+    std::cout << a.first << " " << a.second << std::endl;
+  }
 
   return 0;
-}
+} /*Please provide the details of the code changes you made*/
