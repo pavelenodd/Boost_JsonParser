@@ -19,8 +19,7 @@ void FileManager::OpenPath() {
     } else {
       OpenFile();
     }
-    std::cout << "Cash_json_ size: " << cash_json_.size() << std::endl;
-    // TODO: удалить сделано для визуализации работы
+
   } else {
     std::cout << "Path does not exist or is not a directory!" << std::endl;
   }
@@ -34,12 +33,6 @@ void FileManager::OpenFile() {
     try {
       cash_json_ = ParseJson(file_adress_, key_array_);
 
-      // TODO: удалить сделано для визуализации работы
-      for (const auto& [key, value] : cash_json_) {
-        std::cout << key << ": " << value << std::endl;
-      }
-      //
-
     } catch (const std::exception& e) {
       std::cout << e.what() << '\n';
     }
@@ -50,8 +43,6 @@ void FileManager::OpenDirectopy(b_fs::path L_path) {
   for (const auto& entry : b_fs::directory_iterator(L_path)) {
     std::string file_content = ReadFileContent(entry.path().string());
     cash_json_.insert({entry.path().string(), file_content});
-    std::cout << "File: " << entry.path().string() << "\n";
-    std::cout << "Content:\n" << file_content << "\n";
   }
 }
 
@@ -67,3 +58,5 @@ std::string FileManager::ReadFileContent(const std::string& file_path) {
   file.close();
   return content;
 }
+
+unordered_map_str_str FileManager::Get_Result() const { return cash_json_; }

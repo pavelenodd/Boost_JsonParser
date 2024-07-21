@@ -76,4 +76,6 @@ class FileManager : private parser::JsonParser {
    */
   FileManager(std::string&& L_file_adress);
   ~FileManager();
+
+  unordered_map_str_str Get_Result() const;
 };

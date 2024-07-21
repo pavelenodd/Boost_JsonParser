@@ -16,7 +16,8 @@ int main(int argc, char* argv[]) {
   setlocale(LC_ALL, "ru_RU.UTF-8");
 #endif
 
-  FileManager fm("test");
+  FileManager fm("test/test.json", {"age"});
+  std::cout << fm.Get_Result()[0] << std::endl;
 
   return 0;
 }
