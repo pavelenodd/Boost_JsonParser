@@ -11,28 +11,23 @@
 #include "json_parser.h"
 
 namespace b_fs = boost::filesystem;
-using unordered_map_str_str = std::unordered_map<std::string, std::string>;
+using unordered_map_str_str = std::unordered_multimap<std::string, std::string>;
 
-class FileManager : private parser::JsonParser {
+/**
+ * @brief Режим работы менеджера
+ * @param READ  режим чтения файла =0
+ * @param WRITE режим записи в файл =1
+ */
+enum ManagerState { READ = 0, WRITE = 1 };
+
+class FileManager {
  private:
   unordered_map_str_str cash_json_;  // unordered_map для хранения парсинга
   std::vector<std::string> key_array_;  // Массив ключей для парсинга
-  const std::string file_adress_;  // адрес файла
-
+  std::string file_adress_;             // адрес файла
+  ManagerState manager_state_ = ManagerState::READ;  // режим работы менеджера
  public:
  private:
-  /**
-   * Reads the content of a file.
-   *
-   * @param file_path The path to the file to be read.
-   *
-   * @return The content of the file as a string. If the file cannot be opened,
-   * an empty string is returned.
-   *
-   * @throws None
-   */
-  std::string ReadFileContent(const std::string& file_path);
-
   /**
    * Получение расширения файла
    *
@@ -48,7 +43,7 @@ class FileManager : private parser::JsonParser {
    * @return описание возвращаемого значения
    * @throws ErrorType описание ошибки
    */
-  void OpenFile();
+  void OpenFile(b_fs::path L_path);
 
   /**
    * @brief Открытие пути файла или папки
@@ -68,13 +63,15 @@ class FileManager : private parser::JsonParser {
    * @param L_key_array - массив ключей
    */
   FileManager(std::string&& L_file_adress,  //
-              std::vector<std::string>&& L_key_array);
+              std::vector<std::string>&& L_key_array,
+              ManagerState L_manager_state);
 
   /**
    * @brief Конструктор для парсинга TXT-файла
    * @param L_file_adress - путь к файлу
    */
-  FileManager(std::string&& L_file_adress);
+  FileManager(std::string&& L_file_adress,  //
+              ManagerState L_manager_state);
   ~FileManager();
 
   /**
