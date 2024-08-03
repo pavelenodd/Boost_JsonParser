@@ -28,3 +28,6 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 // TODO сделать поддержку object
+// TODO сделать поддержку array
+// TODO сделать запись в простые переменные
+// TODO сделать запись в массив
