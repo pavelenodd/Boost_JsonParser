@@ -11,7 +11,9 @@
 #include "json_parser.h"
 
 namespace b_fs = boost::filesystem;
-using unordered_map_str_str = std::unordered_multimap<std::string, std::string>;
+using ValueVariant =
+    std::variant<bool, int, double, char, std::string, std::nullptr_t>;
+using vector_pairs = std::vector<std::pair<std::string, ValueVariant>>;
 
 /**
  * @brief Режим работы менеджера
@@ -22,7 +24,7 @@ enum ManagerState { READ = 0, WRITE = 1 };
 
 class FileManager {
  private:
-  unordered_map_str_str cash_json_;  // unordered_map для хранения парсинга
+  vector_pairs cash_json_;  // Массив для хранения парсинга
   std::vector<std::string> key_array_;  // Массив ключей для парсинга
   std::string file_adress_;             // адрес файла
   ManagerState manager_state_ = ManagerState::READ;  // режим работы менеджера
@@ -30,16 +32,13 @@ class FileManager {
  private:
   /**
    * Получение расширения файла
-   *
    * @return описание возвращаемого значения
-   *
    * @throws ErrorType описание ошибки
    */
   void OpenDirectopy(b_fs::path L_path);
 
   /**
    * Получение расширения файла
-   *
    * @return описание возвращаемого значения
    * @throws ErrorType описание ошибки
    */
@@ -49,6 +48,11 @@ class FileManager {
    * @brief Открытие пути файла или папки
    */
   void OpenPath();
+
+  /**
+   * @brief Шаблонная функция для печати значения
+   */
+  static void PrintValue(const auto& value);
 
  public:
   FileManager() = delete;
@@ -61,6 +65,7 @@ class FileManager {
    * @brief Конструктор для парсинга JSON-файла
    * @param L_file_adress - путь к файлу
    * @param L_key_array - массив ключей
+   * @param L_manager_state - режим работы
    */
   FileManager(std::string&& L_file_adress,  //
               std::vector<std::string>&& L_key_array,
@@ -69,19 +74,21 @@ class FileManager {
   /**
    * @brief Конструктор для парсинга TXT-файла
    * @param L_file_adress - путь к файлу
+   * @param L_manager_state - режим работы
    */
   FileManager(std::string&& L_file_adress,  //
               ManagerState L_manager_state);
-  ~FileManager();
+  ~FileManager() {}
 
   /**
-   *Получает результат функции.
-   *
-   *@tparam T тип ключа в неупорядоченной карте
-   *@tparam U тип значения в неупорядоченной карте
-   *
-   *@return неупорядоченная карта, содержащая результат
+   *Получает результат
+   *@return вектор пар ключ-значение
    */
+  vector_pairs Get_Result() const;
 
-  unordered_map_str_str Get_Result() const;
+  /**
+   * @brief Функция для печати результата
+   * @param result Вектор пар ключ-значение
+   */
+  void PrintResult() const;
 };

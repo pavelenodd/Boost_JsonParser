@@ -4,12 +4,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
 #include <string>
-#include <unordered_map>
+#include <variant>
 #include <vector>
 
 namespace parser {
 namespace b_pt = boost::property_tree;
-using unordered_map_str_str = std::unordered_map<std::string, std::string>;
+using ValueVariant =
+    std::variant<bool, int, double, char, std::string, std::nullptr_t>;
+using vector_pairs = std::vector<std::pair<std::string, ValueVariant>>;
 
 class JsonParser {
  private:
@@ -17,13 +19,13 @@ class JsonParser {
 
   /**
    * Считывает содержимое файла JSON и сохраняет его в дереве свойств.
-   * @param L_file_name Путь к файлу JSON для чтения.
+   * @param file_name Путь к файлу JSON для чтения.
    * @throws b_pt::json_parser::json_parser_error Если файл JSON не может быть
    * проанализирован
    */
-  void ReadJson(const std::string& L_file_name) {
+  void ReadJson(const std::string& file_name) {
     try {
-      b_pt::read_json(L_file_name, tree_);
+      b_pt::read_json(file_name, tree_);
     } catch (const b_pt::json_parser::json_parser_error& e) {
       std::cout << e.what() << '\n';
     }
@@ -32,19 +34,63 @@ class JsonParser {
  public:
   /**
    * @brief Парсинг JSON-файла
-   * @param file_name - имя JSON-файла
-   * @param key_array - массив ключей для парсинга
-   * @result unordered_map<std::string, std::string>
+   * @param file_name Имя JSON-файла
+   * @param key_array Массив ключей для парсинга
+   * @return vector_pairs Вектор пар ключ-значение
    */
-  unordered_map_str_str ParseJson(const std::string& file_name,  //
-                                  const std::vector<std::string>& key_array) {
+  vector_pairs ParseJson(const std::string& file_name,
+                         const std::vector<std::string>& key_array) {
     ReadJson(file_name);
 
-    unordered_map_str_str result;
+    vector_pairs result;
     for (const auto& key : key_array) {
-      std::string param = tree_.get<std::string>(key);
-      result[key] = param;
+      ValueVariant param;
+
+      auto child_optional = tree_.get_child_optional(key);
+      if (!child_optional) {
+        std::cerr << "Key: " << key << " not found" << std::endl;
+        continue;
+      }
+      const b_pt::ptree& child = child_optional.get();
+      if (child.empty()) {
+        // Если узел пустой, то это может быть string, int, double, char или
+        // null
+        try {  // Попытка извлечь значение как bool
+          param = tree_.get<bool>(key);
+        } catch (const b_pt::ptree_bad_data&) {
+          try {  // Попытка извлечь значение как int
+            param = tree_.get<int>(key);
+          } catch (const b_pt::ptree_bad_data&) {
+            try {  // Попытка извлечь значение как double
+              param = tree_.get<double>(key);
+            } catch (const b_pt::ptree_bad_data&) {
+              try {  // Попытка извлечь значение как char
+                param = tree_.get<char>(key);
+              } catch (const b_pt::ptree_bad_data&) {
+                try {  // Попытка извлечь значение как string
+                  std::string value = tree_.get<std::string>(key);
+                  if (value.empty()) {
+                    param = nullptr;  // Пустая строка
+                  } else {
+                    param = value;  // Непустая строка
+                  }
+                } catch (const b_pt::ptree_bad_data&) {
+                  param = nullptr;  // null значение
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // Если узел не пустой, то это объект или массив
+        std::cout << "Key: " << key << " is an object or array and is skipped"
+                  << std::endl;
+        continue;  // Пропускаем объекты и массивы
+      }
+
+      result.emplace_back(key, param);
     }
+
     return result;
   }
 };

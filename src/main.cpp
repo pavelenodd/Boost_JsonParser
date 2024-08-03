@@ -16,10 +16,15 @@ int main(int argc, char* argv[]) {
   setlocale(LC_ALL, "ru_RU.UTF-8");
 #endif
 
-  FileManager fm("test", {"age"}, ManagerState::READ);
-  for (auto a : fm.Get_Result()) {
-    std::cout << a.first << " " << a.second << std::endl;
-  }
+  FileManager fm("test",  //
+                 {
+                     "string", "number", "boolean",  //
+                     "double", "null", "empty",      //
+                     "char"                          //
+                 },
+                 ManagerState::READ);
 
+  fm.PrintResult();
   return 0;
-} /*Please provide the details of the code changes you made*/
+}
+// TODO сделать поддержку object
