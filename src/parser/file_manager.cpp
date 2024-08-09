@@ -1,32 +1,18 @@
 #include "file_manager.h"
 
-FileManager::FileManager(std::string&& L_file_adress,
-                         ManagerState L_manager_state)
-    : file_adress_(L_file_adress),  //
-      manager_state_(L_manager_state) {
-  OpenPath();
-}
-
-FileManager::FileManager(std::string&& L_file_adress,  //
-                         std::vector<std::string>&& L_key_array,
-                         ManagerState L_manager_state)
-    : file_adress_(L_file_adress),
-      key_array_(L_key_array),
-      manager_state_(L_manager_state) {
-  OpenPath();
+FileManager::FileManager(std::string&& L_file_adress)
+    : file_adress_(L_file_adress) {
+  if (!b_fs::exists(b_fs::path(L_file_adress))) {
+    std::cerr << "Path does not exist or is not a directory!" << std::endl;
+  }
 }
 
 void FileManager::OpenPath() {
   const b_fs::path L_path = file_adress_;
-  if (b_fs::exists(L_path)) {  // проверка на валидность пути
-    if (b_fs::is_directory(L_path)) {  // проверка является ли путь директорией
-      OpenDirectopy(L_path);
-    } else {
-      OpenFile(L_path);
-    }
-
+  if (b_fs::is_directory(L_path)) {  // проверка является ли путь директорией
+    OpenDirectopy(L_path);
   } else {
-    std::cout << "Path does not exist or is not a directory!" << std::endl;
+    OpenFile(L_path);
   }
 }
 void FileManager::OpenDirectopy(b_fs::path L_path) {
@@ -43,14 +29,39 @@ void FileManager::OpenFile(b_fs::path L_file_path) {
     try {
       parser::JsonParser parser;
 
-      for (auto a : parser.ParseJson(L_file_path.string(), key_array_)) {
-        cash_json_.push_back(a);
+      switch (state_) {
+        case ManagerState::READ: {
+          for (auto a : parser.ParseJson(L_file_path.string(), key_array_)) {
+            cash_json_.push_back(a);
+          }
+          break;
+        }
+        case ManagerState::WRITE: {
+          /* code */
+          break;
+        }
       }
 
     } catch (const std::exception& e) {
       std::cout << e.what() << '\n';
     }
   }
+}
+
+void FileManager::Read(const std::vector<std::string>& L_key_array) {
+  state_ = ManagerState::READ;
+  key_array_ = L_key_array;
+  OpenPath();
+}
+
+void FileManager::Write(const vector_pairs& L_key_array) {
+  state_ = ManagerState::WRITE;
+  key_array_.clear();
+  for (const pairs& a : L_key_array) {
+    key_array_.push_back(a.first);
+    value_array_.push_back(a.second);
+  }
+  OpenPath();
 }
 
 vector_pairs FileManager::Get_Result() const {

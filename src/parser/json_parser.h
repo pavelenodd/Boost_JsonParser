@@ -83,9 +83,11 @@ class JsonParser {
         }
       } else {
         // Если узел не пустой, то это объект или массив
-        std::cout << "Key: " << key << " is an object or array and is skipped"
-                  << std::endl;
-        continue;  // Пропускаем объекты и массивы
+        if (tree_.front().first.empty()) {
+          // Если первый элемент имеет пустой ключ, то это массив
+        } else {
+          // В противном случае это объект
+        }
       }
 
       result.emplace_back(key, param);

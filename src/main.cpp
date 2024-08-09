@@ -15,16 +15,21 @@ int main(int argc, char* argv[]) {
 #ifdef __linux__
   setlocale(LC_ALL, "ru_RU.UTF-8");
 #endif
+  std::vector<std::string> array = {"string", "number", "boolean", "double",
+                                    "null",   "empty",  "char"};
+  {
+    FileManager fm("test/test.json");
+    fm.Read(array);
 
-  FileManager fm("test",  //
-                 {
-                     "string", "number", "boolean",  //
-                     "double", "null", "empty",      //
-                     "char"                          //
-                 },
-                 ManagerState::READ);
+    fm.PrintResult();
 
-  fm.PrintResult();
+    // fm.Write("test2.json");
+  }
+  {
+    // FileManager fm("test.json");
+
+    // fm.PrintResult();
+  }
   return 0;
 }
 // TODO сделать поддержку object

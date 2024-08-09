@@ -11,8 +11,13 @@
 #include "json_parser.h"
 
 namespace b_fs = boost::filesystem;
-using ValueVariant =
-    std::variant<bool, int, double, char, std::string, std::nullptr_t>;
+using ValueVariant = std::variant<bool,
+                                  int,
+                                  double,  //
+                                  char,
+                                  std::string,
+                                  std::nullptr_t>;
+using pairs = std::pair<std::string, ValueVariant>;
 using vector_pairs = std::vector<std::pair<std::string, ValueVariant>>;
 
 /**
@@ -25,9 +30,10 @@ enum ManagerState { READ = 0, WRITE = 1 };
 class FileManager {
  private:
   vector_pairs cash_json_;  // Массив для хранения парсинга
-  std::vector<std::string> key_array_;  // Массив ключей для парсинга
-  std::string file_adress_;             // адрес файла
-  ManagerState manager_state_ = ManagerState::READ;  // режим работы менеджера
+  std::vector<std::string> key_array_;     // Массив ключей
+  std::vector<ValueVariant> value_array_;  // Массив значений
+  const std::string file_adress_;          // адрес файла
+  ManagerState state_ = ManagerState::READ;  // режим работы менеджера
  public:
  private:
   /**
@@ -42,7 +48,7 @@ class FileManager {
    * @return описание возвращаемого значения
    * @throws ErrorType описание ошибки
    */
-  void OpenFile(b_fs::path L_path);
+  void OpenFile(b_fs::path L_file_path);
 
   /**
    * @brief Открытие пути файла или папки
@@ -59,26 +65,21 @@ class FileManager {
   FileManager(const FileManager&) = delete;
   FileManager& operator=(const FileManager&) = delete;
   FileManager(FileManager&&) = delete;
-  // ^удаление сандартного коструктора,копирования,перемещения,присваивания
+  // ^удаление стандартного коструктора,копирования,перемещения,присваивания
 
-  /**
-   * @brief Конструктор для парсинга JSON-файла
-   * @param L_file_adress - путь к файлу
-   * @param L_key_array - массив ключей
-   * @param L_manager_state - режим работы
-   */
-  FileManager(std::string&& L_file_adress,  //
-              std::vector<std::string>&& L_key_array,
-              ManagerState L_manager_state);
+  FileManager(std::string&& L_file_adress);
 
-  /**
-   * @brief Конструктор для парсинга TXT-файла
-   * @param L_file_adress - путь к файлу
-   * @param L_manager_state - режим работы
-   */
-  FileManager(std::string&& L_file_adress,  //
-              ManagerState L_manager_state);
   ~FileManager() {}
+  /**
+   * @brief Чтение файла
+   * @param L_key_array Массив ключей для парсинга
+   */
+  void Read(const std::vector<std::string>& L_key_array);
+
+  /** @brief Запись в файл
+   * @param L_key_array Массив ключ/значение для записи
+   */
+  void Write(const vector_pairs& L_key_array);
 
   /**
    *Получает результат
