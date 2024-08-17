@@ -1,6 +1,6 @@
 #include "file_manager.h"
 
-FileManager::FileManager(std::string&& L_file_adress)
+FileManager::FileManager(std::string& L_file_adress)
     : file_adress_(L_file_adress) {
   if (!b_fs::exists(b_fs::path(L_file_adress))) {
     std::cerr << "Path does not exist or is not a directory!" << std::endl;
@@ -79,7 +79,7 @@ void FileManager::PrintValue(const auto& value) {
   if constexpr (std::is_same_v<std::decay_t<decltype(value)>, std::nullptr_t>) {
     std::cout << "null";
   } else if constexpr (std::is_same_v<std::decay_t<decltype(value)>,
-                                      std::vector<ValueVariant>>) {
+                                      std::vector<value_variant>>) {
     std::cout << "[";
     for (const auto& elem : value) {
       std::visit([](const auto& v) { PrintValue(v); }, elem);
@@ -88,7 +88,7 @@ void FileManager::PrintValue(const auto& value) {
     std::cout << "]";
   } else if constexpr (std::is_same_v<
                            std::decay_t<decltype(value)>,
-                           std::unordered_map<std::string, ValueVariant>>) {
+                           std::unordered_map<std::string, value_variant>>) {
     std::cout << "{";
     for (const auto& elem : value) {
       std::cout << "\"" << elem.first << "\": ";

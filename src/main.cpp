@@ -4,7 +4,8 @@
 #ifdef __linux__
 #include <locale.h>
 #endif
-
+#include <filesystem>
+#include <string>
 #include "parser/file_manager.h"
 
 int main(int argc, char* argv[]) {
@@ -15,21 +16,29 @@ int main(int argc, char* argv[]) {
 #ifdef __linux__
   setlocale(LC_ALL, "ru_RU.UTF-8");
 #endif
-  std::vector<std::string> array = {"string", "number", "boolean", "double",
-                                    "null",   "empty",  "char"};
+  const std::string programm_path =
+      (std::filesystem::current_path()).string() + '/';
+
   {
-    FileManager fm("test/test.json");
-    fm.Read(array);
+    // простой набор значений
+    std::vector<std::string> simple_array = {
+        "string", "number", "boolean", "double", "null", "empty", "char"};
+
+    // пример json массива
+    std::pair<std::string, value_variant> json_array;
+
+    // пример json объекта
+
+    std::string file_path = programm_path + "test/test.json";
+    FileManager fm(file_path);
+    fm.Read(simple_array);
 
     fm.PrintResult();
-
-    // fm.Write("test2.json");
   }
-  {
-    // FileManager fm("test.json");
-
-    // fm.PrintResult();
-  }
+  {}
+#ifdef _WIN32
+  system("pause");
+#endif
   return 0;
 }
 // TODO сделать поддержку object

@@ -7,11 +7,10 @@
 #include <variant>
 #include <vector>
 
+#include "data.h"
+
 namespace parser {
 namespace b_pt = boost::property_tree;
-using ValueVariant =
-    std::variant<bool, int, double, char, std::string, std::nullptr_t>;
-using vector_pairs = std::vector<std::pair<std::string, ValueVariant>>;
 
 class JsonParser {
  private:
@@ -44,7 +43,7 @@ class JsonParser {
 
     vector_pairs result;
     for (const auto& key : key_array) {
-      ValueVariant param;
+      value_variant param;
 
       auto child_optional = tree_.get_child_optional(key);
       if (!child_optional) {
@@ -85,8 +84,35 @@ class JsonParser {
         // Если узел не пустой, то это объект или массив
         if (tree_.front().first.empty()) {
           // Если первый элемент имеет пустой ключ, то это массив
+
         } else {
           // В противном случае это объект
+          try {  // Попытка извлечь значение как bool
+            param = tree_.get<bool>(key);
+          } catch (const b_pt::ptree_bad_data&) {
+            try {  // Попытка извлечь значение как int
+              param = tree_.get<int>(key);
+            } catch (const b_pt::ptree_bad_data&) {
+              try {  // Попытка извлечь значение как double
+                param = tree_.get<double>(key);
+              } catch (const b_pt::ptree_bad_data&) {
+                try {  // Попытка извлечь значение как char
+                  param = tree_.get<char>(key);
+                } catch (const b_pt::ptree_bad_data&) {
+                  try {  // Попытка извлечь значение как string
+                    std::string value = tree_.get<std::string>(key);
+                    if (value.empty()) {
+                      param = nullptr;  // Пустая строка
+                    } else {
+                      param = value;  // Непустая строка
+                    }
+                  } catch (const b_pt::ptree_bad_data&) {
+                    param = nullptr;  // null значение
+                  }
+                }
+              }
+            }
+          }
         }
       }
 

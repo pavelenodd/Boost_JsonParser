@@ -8,17 +8,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "data.h"
 #include "json_parser.h"
 
 namespace b_fs = boost::filesystem;
-using ValueVariant = std::variant<bool,
-                                  int,
-                                  double,  //
-                                  char,
-                                  std::string,
-                                  std::nullptr_t>;
-using pairs = std::pair<std::string, ValueVariant>;
-using vector_pairs = std::vector<std::pair<std::string, ValueVariant>>;
 
 /**
  * @brief Режим работы менеджера
@@ -31,7 +24,7 @@ class FileManager {
  private:
   vector_pairs cash_json_;  // Массив для хранения парсинга
   std::vector<std::string> key_array_;     // Массив ключей
-  std::vector<ValueVariant> value_array_;  // Массив значений
+  std::vector<complex_value> value_array_;              // Массив значений
   const std::string file_adress_;          // адрес файла
   ManagerState state_ = ManagerState::READ;  // режим работы менеджера
  public:
@@ -67,7 +60,7 @@ class FileManager {
   FileManager(FileManager&&) = delete;
   // ^удаление стандартного коструктора,копирования,перемещения,присваивания
 
-  FileManager(std::string&& L_file_adress);
+  FileManager(std::string& L_file_adress);
 
   ~FileManager() {}
   /**
