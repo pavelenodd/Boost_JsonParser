@@ -6,9 +6,10 @@
 #endif
 #include <filesystem>
 #include <string>
+#include "parser/data.h"
 #include "parser/file_manager.h"
 
-int main(int argc, char* argv[]) {
+int main() {
 #ifdef _WIN32
   SetConsoleCP(1251);
   SetConsoleOutputCP(1251);
@@ -16,26 +17,32 @@ int main(int argc, char* argv[]) {
 #ifdef __linux__
   setlocale(LC_ALL, "ru_RU.UTF-8");
 #endif
-  const std::string programm_path =
-      (std::filesystem::current_path()).string() + '/';
 
+  std::string file_path = programm_path + "test/test.json";
+  FileManager fm(file_path);
   {
     // простой набор значений
     std::vector<std::string> simple_array = {
         "string", "number", "boolean", "double", "null", "empty", "char"};
 
-    // пример json массива
-    std::pair<std::string, value_variant> json_array;
-
-    // пример json объекта
-
-    std::string file_path = programm_path + "test/test.json";
-    FileManager fm(file_path);
     fm.Read(simple_array);
-
+    std::cout << "current result \n";
     fm.PrintResult();
   }
-  {}
+  {
+    std::vector<pairs> simple_array = {{"string", "new_string"},
+                                       {"number", 123},
+                                       {"boolean", false},
+                                       {"double", 123.456},
+                                       {"null", 2},
+                                       {" empty ", " qweqwe "},
+                                       {"char", 'x'}};
+
+    fm.Write(simple_array);
+    std::cout << "new recult \n";
+    fm.PrintResult();
+  }
+
 #ifdef _WIN32
   system("pause");
 #endif

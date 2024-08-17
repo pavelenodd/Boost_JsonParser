@@ -1,8 +1,8 @@
 #pragma once
+#include <filesystem>
 #include <string>
 #include <variant>
 #include <vector>
-
 using value_variant = std::variant<bool,
                                    int,  //
                                    double,
@@ -18,3 +18,10 @@ using complex_value = std::variant<value_variant,  //
                                    value_array,
                                    pairs,
                                    vector_pairs>;
+
+/*=============================================
+константные значения
+===============================================*/
+
+const static std::string programm_path =
+    (std::filesystem::current_path()).string() + '/';

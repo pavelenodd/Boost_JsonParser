@@ -24,7 +24,6 @@ class FileManager {
  private:
   vector_pairs cash_json_;  // Массив для хранения парсинга
   std::vector<std::string> key_array_;     // Массив ключей
-  std::vector<complex_value> value_array_;              // Массив значений
   const std::string file_adress_;          // адрес файла
   ManagerState state_ = ManagerState::READ;  // режим работы менеджера
  public:

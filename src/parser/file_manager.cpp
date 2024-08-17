@@ -31,13 +31,15 @@ void FileManager::OpenFile(b_fs::path L_file_path) {
 
       switch (state_) {
         case ManagerState::READ: {
-          for (auto a : parser.ParseJson(L_file_path.string(), key_array_)) {
+          for (auto a :
+               parser.Read_ParseJson(L_file_path.string(), key_array_)) {
             cash_json_.push_back(a);
           }
           break;
         }
         case ManagerState::WRITE: {
-          /* code */
+          ;
+          parser.Write_ParseJson(L_file_path.string(), cash_json_);
           break;
         }
       }
@@ -56,11 +58,8 @@ void FileManager::Read(const std::vector<std::string>& L_key_array) {
 
 void FileManager::Write(const vector_pairs& L_key_array) {
   state_ = ManagerState::WRITE;
-  key_array_.clear();
-  for (const pairs& a : L_key_array) {
-    key_array_.push_back(a.first);
-    value_array_.push_back(a.second);
-  }
+  cash_json_ = L_key_array;
+
   OpenPath();
 }
 
