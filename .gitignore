@@ -5,6 +5,6 @@ test
 .vscode
 #files
 *.dll
-*src/main.cpp
+src/main.cpp
 *.txt
 
