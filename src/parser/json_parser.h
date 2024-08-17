@@ -7,9 +7,9 @@
 #include <variant>
 #include <vector>
 
-#include "data.h"
 
 namespace parser {
+#include "data.h"
 namespace b_pt = boost::property_tree;
 
 class JsonParser {
