@@ -20,7 +20,7 @@ namespace b_fs = boost::filesystem;
  */
 enum ManagerState { READ = 0, WRITE = 1 };
 
-class FileManager {
+class ParserManager {
  private:
   vector_pairs cash_json_;                   // Массив для хранения парсинга
   std::vector<std::string> key_array_;       // Массив ключей
@@ -53,15 +53,15 @@ class FileManager {
   static void PrintValue(const auto& value);
 
  public:
-  FileManager() = delete;
-  FileManager(const FileManager&) = delete;
-  FileManager& operator=(const FileManager&) = delete;
-  FileManager(FileManager&&) = delete;
+  ParserManager() {};
+  ParserManager(const ParserManager&) = delete;
+  ParserManager& operator=(const ParserManager&) = delete;
+  ParserManager(ParserManager&&) = delete;
   // ^удаление стандартного коструктора,копирования,перемещения,присваивания
 
-  FileManager(std::string& L_file_adress);
+  ParserManager(std::string& L_file_adress);
 
-  ~FileManager() {}
+  ~ParserManager() {}
   /**
    * @brief Чтение файла
    * @param L_key_array Массив ключей для парсинга
