@@ -8,8 +8,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "data.h"
-#include "json_parser.h"
+#include "parser/data.h"
+#include "parser/json_parser.h"
 
 namespace b_fs = boost::filesystem;
 
@@ -22,9 +22,9 @@ enum ManagerState { READ = 0, WRITE = 1 };
 
 class FileManager {
  private:
-  vector_pairs cash_json_;  // Массив для хранения парсинга
-  std::vector<std::string> key_array_;     // Массив ключей
-  const std::string file_adress_;          // адрес файла
+  vector_pairs cash_json_;                   // Массив для хранения парсинга
+  std::vector<std::string> key_array_;       // Массив ключей
+  const std::string file_adress_;            // адрес файла
   ManagerState state_ = ManagerState::READ;  // режим работы менеджера
  public:
  private:
